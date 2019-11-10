@@ -1,5 +1,10 @@
 #include <Servo.h>
 
+#define trigPin 3
+#define echoPin 2
+
+float duration, distance;
+
 Servo lServo; //left motor
 Servo rServo; //right motor
 
@@ -16,20 +21,27 @@ void setup() {
   lServo.attach(8); // attach to pin 8
   rServo.attach(9); // attach to pin 9
 
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
 
 
 }
 
 void loop() {
 
+/*
   while (executed == true){
-
     Serial.println("Executing Test!");
-    test();
+    final();
     executed = false;
   }
+*/
 
+  final();
   Serial.println("Still running loop");
+  
+  //echo();
 
 }
 
@@ -75,6 +87,127 @@ void test(){
   lServo.write(90);
   rServo.write(90);
 
+}
+
+void echo() {
+
+  // Write a pulse to the HC-SR04 Trigger Pin
+
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Measure the response from the HC-SR04 Echo Pin
+
+  duration = pulseIn(echoPin, HIGH);
+
+  // Determine distance from duration
+  // Use 343 metres per second as speed of sound
+
+  distance = (duration/2)*0.0343;
+
+  // Send results to Serial Monitor
+
+  Serial.print("Distance = ");
+  if (distance >= 400 || distance <= 2) {
+    Serial.println("Out of range");
+  }
+
+  else{
+    Serial.print(distance);
+    Serial.println(" cm");
+    delay(500);
+  }
+
+  delay(500);
+
 
   
+}
+
+
+void detectWall() {
+
+  // Write a pulse to the HC-SR04 Trigger Pin
+
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  // Measure the response from the HC-SR04 Echo Pin
+
+  duration = pulseIn(echoPin, HIGH);
+
+  // Determine distance from duration
+  // Use 343 metres per second as speed of sound
+
+  distance = (duration/2)*0.0343;
+
+  // Send results to Serial Monitor
+  
+   // Closing in on Wall
+  while (distance <= 8) {
+
+    Serial.print("Distance = ");
+    Serial.print(distance);
+    Serial.println(" cm");
+    
+    lServo.write(100); //go backwards slowly; left motor go back slowly
+    rServo.write(100); // right motor go back slowly
+    
+    delay(1000);
+
+
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    duration = pulseIn(echoPin, HIGH);
+
+    distance = (duration/2)*0.0343;
+
+    delay(1000);
+
+  }
+  
+  Serial.print("Distance = ");
+  Serial.print(distance);
+  Serial.println(" cm");
+  delay(1000);
+
+
+  
+}
+
+
+
+
+
+
+void final() {
+
+  detectWall();
+
+  // go forward slowly 
+  lServo.write(80); 
+  rServo.write(80);
+
+  delay(500); // delay for 1s
+  
+  // STOP
+  lServo.write(90); // 90 means stop; left motor stop
+  rServo.write(90); // right motor stop
+  
+  delay(500); // delay for 1s
+
+  detectWall();
+
+ 
+
 }
