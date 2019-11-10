@@ -150,17 +150,37 @@ void detectWall() {
   // Send results to Serial Monitor
   
    // Closing in on Wall
-  while (distance <= 8) {
+  while (distance <= 15) {
 
     Serial.print("Distance = ");
     Serial.print(distance);
     Serial.println(" cm");
-    
+
+
+    Serial.print("Going Backwards!");
     lServo.write(100); //go backwards slowly; left motor go back slowly
     rServo.write(100); // right motor go back slowly
     
+    delay(500);
+
+    // STOP
+    lServo.write(90); // 90 means stop; left motor stop
+    rServo.write(90); // right motor stop
+
+    delay(500);
+    
+    // THIS IS TURNING LEFT
+    Serial.print("Turning Left");
+    lServo.write(100); // left motor go backwards slowly
+    rServo.write(80); // right motor go forward slowly
+
     delay(1000);
 
+    // STOP
+    lServo.write(90); // 90 means stop; left motor stop
+    rServo.write(90); // right motor stop
+
+    delay(500);
 
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
@@ -186,15 +206,12 @@ void detectWall() {
 }
 
 
-
-
-
-
 void final() {
 
   detectWall();
 
-  // go forward slowly 
+  // go forward slowly
+  Serial.print("Going forward!"); 
   lServo.write(80); 
   rServo.write(80);
 
